@@ -17,7 +17,7 @@ def generate_list():
 def binary_search_on_state(user_number, arr_state):
     # If user hasn't generated a list yet
     if not arr_state:
-        list_msg = "⚠️ Please click 'Generate List' first."
+        list_msg = "Please click 'Generate List' first."
         # Return list warning, blank step messages, blank ranges, and final result message
         return (
             list_msg,
@@ -34,7 +34,7 @@ def binary_search_on_state(user_number, arr_state):
             f"Random Sorted List:\n{arr_state}",
             *["" for _ in range(MAX_STEPS)],
             *["" for _ in range(MAX_STEPS)],
-            "⚠️ Enter a valid integer."
+            " Enter a valid integer."
         )
 
     arr = arr_state[:]  # copy for safety
