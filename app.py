@@ -23,7 +23,7 @@ def binary_search_on_state(user_number, arr_state):
             list_msg,
             *["" for _ in range(MAX_STEPS)],  # step messages
             *["" for _ in range(MAX_STEPS)],  # range messages
-            "⚠️ No list to search."
+            " No list to search."
         )
 
     # Validate input
@@ -89,7 +89,7 @@ def binary_search_on_state(user_number, arr_state):
 with gr.Blocks(title="Binary Search Game — Two-Stage + Range View") as demo:
     gr.Markdown(
         """
-        # 🎯 Binary Search Game — Two-Stage (with Remaining Range)
+        # Binary Search Game — Two-Stage (with Remaining Range)
         **Step 1:** Click **Generate List** (10 unique numbers in 1–49).  
         **Step 2:** Enter a number and click **Run Binary Search**.  
         See each decision and the *remaining range* after every step.
