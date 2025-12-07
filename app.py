@@ -1,0 +1,133 @@
+import random
+import gradio as gr
+
+MAX_STEPS = 8  # number of step boxes to show
+
+# -------------------------
+# Stage 1: Generate the list
+# -------------------------
+def generate_list():
+    arr = sorted(random.sample(range(1, 50), 10))   # 10 unique ints in [1..49]
+    display = f"Random Sorted List:\n{arr}"
+    return display, arr
+
+# -------------------------
+# Stage 2: Run the search
+# -------------------------
+def binary_search_on_state(user_number, arr_state):
+    # If user hasn't generated a list yet
+    if not arr_state:
+        list_msg = "⚠️ Please click 'Generate List' first."
+        # Return list warning, blank step messages, blank ranges, and final result message
+        return (
+            list_msg,
+            *["" for _ in range(MAX_STEPS)],  # step messages
+            *["" for _ in range(MAX_STEPS)],  # range messages
+            "⚠️ No list to search."
+        )
+
+    # Validate input
+    try:
+        target = int(user_number)
+    except (TypeError, ValueError):
+        return (
+            f"Random Sorted List:\n{arr_state}",
+            *["" for _ in range(MAX_STEPS)],
+            *["" for _ in range(MAX_STEPS)],
+            "⚠️ Enter a valid integer."
+        )
+
+    arr = arr_state[:]  # copy for safety
+    steps = []
+    ranges = []
+    low, high = 0, len(arr) - 1
+    found = False
+
+    # Record initial range before any check (optional but helpful)
+    ranges.append(f"Initial range [low={low}, high={high}] → {arr[low:high+1]}")
+
+    while low <= high:
+        mid = (low + high) // 2
+        steps.append(f"Check middle index {mid} → value {arr[mid]}")
+
+        if arr[mid] == target:
+            steps.append(f"✅ Found {target} at index {mid}")
+            found = True
+            # After finding, remaining range is just the match
+            ranges.append(f"Remaining range [low={mid}, high={mid}] → [{arr[mid]}]")
+            break
+        elif arr[mid] < target:
+            low = mid + 1
+            ranges.append(f"Move right → new range [low={low}, high={high}] → {arr[low:high+1] if low <= high else []}")
+        else:
+            high = mid - 1
+            ranges.append(f"Move left → new range [low={low}, high={high}] → {arr[low:high+1] if low <= high else []}")
+
+    if not found:
+        steps.append(f"❌ The number {target} was not found.")
+
+    # Pad to fill consistent UI boxes
+    while len(steps) < MAX_STEPS:
+        steps.append("")
+    while len(ranges) < MAX_STEPS:
+        ranges.append("")
+
+    final_msg = f"✅ The number {target} was found!" if found else f"❌ The number {target} was not found."
+    list_display = f"Random Sorted List:\n{arr}"
+
+    # Return:
+    #   1 list box,
+    #   MAX_STEPS step messages,
+    #   MAX_STEPS range messages,
+    #   1 final result box
+    return list_display, *steps[:MAX_STEPS], *ranges[:MAX_STEPS], final_msg
+
+
+# -------------------------
+# UI
+# -------------------------
+with gr.Blocks(title="Binary Search Game — Two-Stage + Range View") as demo:
+    gr.Markdown(
+        """
+        # 🎯 Binary Search Game — Two-Stage (with Remaining Range)
+        **Step 1:** Click **Generate List** (10 unique numbers in 1–49).  
+        **Step 2:** Enter a number and click **Run Binary Search**.  
+        See each decision and the *remaining range* after every step.
+        """
+    )
+
+    # App state to hold the generated list across button clicks
+    arr_state = gr.State([])
+
+    with gr.Row():
+        gen_btn = gr.Button("Generate List 🎲", variant="secondary")
+        user_number = gr.Number(label="Enter a number to search (1–49)", value=1, precision=0)
+        run_btn = gr.Button("Run Binary Search 🔎", variant="primary")
+
+    # List display
+    list_box = gr.Textbox(label="Generated Sorted List", lines=2, interactive=False)
+
+    gr.Markdown("### 🔹 Search Steps (Decision Trace)")
+    step_boxes = [gr.Textbox(label=f"Step {i+1}", lines=1, interactive=False) for i in range(MAX_STEPS)]
+
+    gr.Markdown("### 🔸 Remaining Range After Each Step")
+    range_boxes = [gr.Textbox(label=f"Range {i+1}", lines=1, interactive=False) for i in range(MAX_STEPS)]
+
+    # Final result
+    result_box = gr.Textbox(label="Final Result", lines=1, interactive=False)
+
+    # Wire up events
+    gen_btn.click(
+        fn=generate_list,
+        inputs=[],
+        outputs=[list_box, arr_state],
+    )
+
+    run_btn.click(
+        fn=binary_search_on_state,
+        inputs=[user_number, arr_state],
+        outputs=[list_box, *step_boxes, *range_boxes, result_box],
+    )
+
+if __name__ == "__main__":
+    demo.launch()
