@@ -10,7 +10,7 @@ def generate_list():
     display = f"Random Sorted List:\n{arr}"
     return display, arr
 
-# Stage 2: Run the search
+Stage 2: Run the search
 
 def binary_search_on_state(user_number, arr_state):
     # If user hasn't generated a list yet
@@ -49,7 +49,7 @@ def binary_search_on_state(user_number, arr_state):
         steps.append(f"Check middle index {mid} → value {arr[mid]}")
 
         if arr[mid] == target:
-            steps.append(f"✅ Found {target} at index {mid}")
+            steps.append(f" Found {target} at index {mid}")
             found = True
             # After finding, remaining range is just the match
             ranges.append(f"Remaining range [low={mid}, high={mid}] → [{arr[mid]}]")
@@ -62,7 +62,7 @@ def binary_search_on_state(user_number, arr_state):
             ranges.append(f"Move left → new range [low={low}, high={high}] → {arr[low:high+1] if low <= high else []}")
 
     if not found:
-        steps.append(f"❌ The number {target} was not found.")
+        steps.append(f" The number {target} was not found.")
 
     # Pad to fill consistent UI boxes
     while len(steps) < MAX_STEPS:
@@ -70,7 +70,7 @@ def binary_search_on_state(user_number, arr_state):
     while len(ranges) < MAX_STEPS:
         ranges.append("")
 
-    final_msg = f"The number {target} was found!" if found else f"❌ The number {target} was not found."
+    final_msg = f"The number {target} was found!" if found else f" The number {target} was not found."
     list_display = f"Random Sorted List:\n{arr}"
 
     # Return:
